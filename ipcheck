@@ -8,7 +8,6 @@ fi
 case $1 in
 
 	"-s")
-#		ip_var=$(ip -json route get 8.8.8.8 | jq -r '.[].prefsrc')
 		ip_var=$(curl -s ifconfig.me)
 		loc=$(curl -s http://ip-api.com/json/$ip_var | jq -r ".city")
 		echo "$ip_var, $loc"
