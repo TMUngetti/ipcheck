@@ -11,8 +11,13 @@ case $1 in
 #		ip_var=$(ip -json route get 8.8.8.8 | jq -r '.[].prefsrc')
 		ip_var=$(curl -s ifconfig.me)
 		loc=$(curl -s http://ip-api.com/json/$ip_var | jq -r ".city")
-		echo "$ip_var, $loc"
-		;;
+
+		if [[ -z $ip_var ]]; then
+			echo "No IP Assigned"
+		else
+			echo "$ip_var, $loc"
+		fi
+			;;
 
 	"-h")
 		hostname=$2
