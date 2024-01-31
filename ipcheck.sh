@@ -5,19 +5,27 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
+# COLORS
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 case $1 in
 
 	"-s")
-#		ip_var=$(ip -json route get 8.8.8.8 | jq -r '.[].prefsrc')
 		ip_var=$(curl -s ifconfig.me)
-		loc=$(curl -s http://ip-api.com/json/$ip_var | jq -r ".city")
+		country_code=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".countryCode")
+		loc=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".city")
+		zip=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".zip")
+		proxy=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".proxy")
+		status=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".status")
 
-		if [[ -z $ip_var ]]; then
-			echo "No IP Assigned"
+		if [ $status="success" ]; then
+			echo -e "$GREEN[$status]$NC : $ip_var : $loc, $zip, $country_code : $CYAN$proxy$NC"
 		else
-			echo "$ip_var, $loc"
+			echo -e "[ $status ] : Something went wrong, check syntax"
 		fi
-			;;
+		;;
 
 	"-h")
 		hostname=$2
@@ -28,8 +36,17 @@ case $1 in
 		fi
 
 		ip_var=$(dig +short $hostname)
-		loc=$(curl -s http://ip-api.com/json/$ip_var | jq -r ".city")
-		echo "$ip_var, $loc"
+		country_code=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".countryCode")
+		loc=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".city")
+		zip=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".zip")
+		proxy=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".proxy")
+		status=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".status")
+
+		if [ $status="success" ]; then
+			echo -e "$GREEN[$status]$NC : $ip_var : $loc, $zip, $country_code : $CYAN$proxy$NC"
+		else
+			echo -e "[ $status ] : Something went wrong, check syntax"
+		fi
 		;;
 	
 	"-ip")
