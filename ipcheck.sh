@@ -1,14 +1,15 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-	echo "ERROR: command needs an argument"
-	exit 1
-fi
-
 # COLORS
 CYAN='\033[0;36m'
 GREEN='\033[0;32m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
+
+if [[ $# -eq 0 ]]; then
+	echo -e "$RED[ERROR]$NC: Command needs an argument"
+	exit 1
+fi
 
 case $1 in
 
@@ -20,10 +21,10 @@ case $1 in
 		proxy=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".proxy")
 		status=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".status")
 
-		if [ $status="success" ]; then
+		if [[ $status == "success" ]]; then
 			echo -e "$GREEN[$status]$NC : $ip_var : $loc, $zip, $country_code : $CYAN$proxy$NC"
-		else
-			echo -e "[ $status ] : Something went wrong, check syntax"
+		elif [[ $status == "fail" ]]; then
+			echo -e "$RED[$status]$NC : Something went wrong, check syntax"
 		fi
 		;;
 
@@ -42,23 +43,32 @@ case $1 in
 		proxy=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".proxy")
 		status=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".status")
 
-		if [ $status="success" ]; then
+		if [[ $status == "success" ]]; then
 			echo -e "$GREEN[$status]$NC : $ip_var : $loc, $zip, $country_code : $CYAN$proxy$NC"
-		else
-			echo -e "[ $status ] : Something went wrong, check syntax"
+		elif [[ $status == "fail" ]]; then
+			echo -e "$RED[$status]$NC : Something went wrong, check syntax"
 		fi
 		;;
 	
 	"-ip")
-		ip=$2
+		ip_var=$2
 
 		if [ $# -lt 2 ]; then
 			echo "ERROR: no ip defined"
 			exit 1
 		fi
 
-		loc=$(curl -s http://ip-api.com/json/$ip | jq -r ".city")
-		echo "$ip, $loc"
+		country_code=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".countryCode")
+		loc=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".city")
+		zip=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".zip")
+		proxy=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".proxy")
+		status=$(curl -s http://ip-api.com/json/$ip_var?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,proxy,query | jq -r ".status")
+
+		if [[ $status == "success" ]]; then
+			echo -e "$GREEN[$status]$NC : $ip_var : $loc, $zip, $country_code : $CYAN$proxy$NC"
+		elif [[ $status == "fail" ]]; then
+			echo -e "$RED[$status]$NC : Something went wrong, check syntax"
+		fi
 		;;
 
 	"--help")
